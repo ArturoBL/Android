@@ -1,0 +1,5 @@
+- Para correr correctamente debe estar desactivado el firewall.
+- Cuando el cliente android se conecta al servidor envía una cadena que es recibida y desplegada en el servidor.
+- Después de mandar el mensaje se cierra la conexión.
+- El mensaje es mandado como utf y decodificado como ansi en el servidor.
+
