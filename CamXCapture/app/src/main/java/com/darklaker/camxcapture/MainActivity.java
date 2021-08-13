@@ -14,8 +14,11 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import android.Manifest;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,6 +28,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +46,7 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
     static Button btnClose, btnLens, btnVideo, btnStop, btnPhoto;
+    static CheckBox chkFlash;
 
     private Executor executor = Executors.newSingleThreadExecutor();
     CameraSelector cameraSelector;
@@ -88,13 +93,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startCamera() {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         btnPhoto = findViewById(R.id.btnPhoto);
         btnVideo = findViewById(R.id.btnVideo);
         btnStop = findViewById(R.id.btnStop);
         btnLens = findViewById(R.id.btnLens);
         btnClose = findViewById(R.id.btnClose);
-        mCameraView = findViewById(R.id.view_finder);
+
         mCameraView.setFlash(ImageCapture.FLASH_MODE_AUTO);
+
+        //mCameraView.setFlash(CameraView.FLASH_MODE_TORCH);
+        chkFlash = findViewById(R.id.chkFlash);
 
         //can set flash mode to auto,on,off...
         ImageCapture.Builder builder = new ImageCapture.Builder();
@@ -111,6 +120,32 @@ public class MainActivity extends AppCompatActivity {
         }
         mCameraView.bindToLifecycle((LifecycleOwner) MainActivity.this);
 
+        chkFlash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chkFlash.isChecked()){
+
+                    try {
+                        String cameraId = cameraManager.getCameraIdList()[0];
+                        cameraManager.setTorchMode(cameraId, false);
+                        chkFlash.setChecked(false);
+                    }
+                    catch (CameraAccessException e)
+                    {Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();}
+                }else{
+
+                    try {
+                        String cameraId = cameraManager.getCameraIdList()[0];
+                        cameraManager.setTorchMode(cameraId, true);
+                        chkFlash.setChecked(true);
+                        Toast.makeText(MainActivity.this, "Encendido.", Toast.LENGTH_SHORT).show();
+                    }
+                    catch (CameraAccessException e)
+                    {Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();}
+
+                }
+            }
+        });
 
         btnPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
