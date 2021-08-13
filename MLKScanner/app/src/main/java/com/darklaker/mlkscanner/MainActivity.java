@@ -7,6 +7,7 @@ https://www.youtube.com/channel/UC-4ey4ofBxcTuKIKfM_4nlg
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
@@ -112,7 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         imageAnalysis.setAnalyzer(cameraExecutor, analyzer);
         processCameraProvider.unbindAll();
-        processCameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+        Camera camera = processCameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+        /*if (camera.getCameraInfo().hasFlashUnit()){
+            camera.getCameraControl().enableTorch(true);
+        }*/
     }
 
     public class MyImageAnalyzer implements ImageAnalysis.Analyzer{
