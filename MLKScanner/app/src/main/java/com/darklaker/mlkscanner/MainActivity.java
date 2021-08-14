@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         analyzer = new MyImageAnalyzer(getSupportFragmentManager());
 
+
+
         cameraProviderFuture.addListener(new Runnable() {
             @Override
             public void run() {
