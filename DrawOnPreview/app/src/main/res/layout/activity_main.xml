@@ -9,11 +9,11 @@
     <androidx.camera.view.PreviewView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/previewview" />
+        android:id="@+id/previewview"/>
 
-    <com.arturo.beristain.drawonpreview.GraphicOverlay
+    <com.arturo.beristain.drawonpreview.OverlayView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/graphic_overlay" />
+        android:id="@+id/overlayview"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

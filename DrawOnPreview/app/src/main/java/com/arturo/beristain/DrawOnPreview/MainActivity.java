@@ -12,17 +12,12 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-
 import android.Manifest;
-
-
 import android.content.pm.PackageManager;
-
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Size;
-
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -30,28 +25,25 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private PreviewView previewView;
     private ListenableFuture cameraProviderFuture;
     private ExecutorService cameraExecutor;
-    private GraphicOverlay graphicOverlay;
+    private OverlayView overlayView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         previewView = findViewById(R.id.previewview);
-        graphicOverlay = findViewById(R.id.graphic_overlay);
+        overlayView = findViewById(R.id.overlayview);
 
         this.getWindow().setFlags(1024,1024);
 
         cameraExecutor = Executors.newSingleThreadExecutor();
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-        //analyzer = new MyImageAnalyzer(getSupportFragmentManager());
 
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -79,22 +71,12 @@ public class MainActivity extends AppCompatActivity {
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
         ImageCapture imageCapture = new ImageCapture.Builder().build();
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setTargetResolution(new Size(1280,720))
+                //.setTargetResolution(new Size(1280,720))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
         //imageAnalysis.setAnalyzer(cameraExecutor, analyzer);
         processCameraProvider.unbindAll();
         Camera camera = processCameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
-        BarcodeGraphic barcodeGraphic = new BarcodeGraphic(graphicOverlay);
 
-
-        
-        barcodeGraphic.setRect(new Rect(400,200,600,300));
-
-        graphicOverlay.add(barcodeGraphic);
-
-        /*if (camera.getCameraInfo().hasFlashUnit()){
-            camera.getCameraControl().enableTorch(true);
-        }*/
     }
 }
