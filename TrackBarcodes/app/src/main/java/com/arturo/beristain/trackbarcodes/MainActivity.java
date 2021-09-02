@@ -1,8 +1,4 @@
-package com.darklaker.mlkscanner;
-/*
-Code written by Android Coding Time
-https://www.youtube.com/channel/UC-4ey4ofBxcTuKIKfM_4nlg
- */
+package com.arturo.beristain.trackbarcodes;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,23 +17,14 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.media.AudioManager;
 import android.media.Image;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
-
-import android.os.Vibrator;
 import android.util.Size;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.CheckBox;
-
-
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,50 +44,24 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
+    private PreviewView previewView;
     private ListenableFuture cameraProviderFuture;
     private ExecutorService cameraExecutor;
-    private PreviewView previewView;
-    private MyImageAnalyzer analyzer;
     private OverlayView overlayView;
-    private CheckBox chkFlash;
-    private Camera camera;
-    private ToneGenerator tg;
-    private int nb;
-    public Vibrator v;
-
-
+    private MyImageAnalyzer analyzer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-
         previewView = findViewById(R.id.previewview);
         overlayView = findViewById(R.id.overlayview);
-        chkFlash =  findViewById(R.id.chkFlash);
-        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        this.getWindow().setFlags(1024,1024);
 
+        this.getWindow().setFlags(1024,1024);
 
         cameraExecutor = Executors.newSingleThreadExecutor();
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-        analyzer = new MyImageAnalyzer(getSupportFragmentManager());
-        tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        nb = 0;
-
-
-        chkFlash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (camera.getCameraInfo().hasFlashUnit()){
-                    camera.getCameraControl().enableTorch(chkFlash.isChecked());
-                }
-            }
-        });
 
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -122,49 +83,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0) {
-            ProcessCameraProvider processCameraProvider = null;
-            try {
-                processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            bindpreview(processCameraProvider);
-            bindpreview(processCameraProvider);
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void bindpreview(ProcessCameraProvider processCameraProvider) {
         Preview preview = new Preview.Builder().build();
         CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
         ImageCapture imageCapture = new ImageCapture.Builder().build();
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setTargetResolution(new Size(1080,1920))
+                .setTargetResolution(new Size(1280,720))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
         imageAnalysis.setAnalyzer(cameraExecutor, analyzer);
         processCameraProvider.unbindAll();
-        camera = processCameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+        Camera camera = processCameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
 
-        /**/
     }
 
     public class MyImageAnalyzer implements ImageAnalysis.Analyzer{
-        /*private FragmentManager fragmentManager;
-        private bottom_dialog bd;*/
-        //private Vibrator v;
+
+
 
         public MyImageAnalyzer(FragmentManager fragmentManager) {
-            //v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            /*this.fragmentManager = fragmentManager;
-            bd = new bottom_dialog();*/
+
         }
 
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -182,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     new BarcodeScannerOptions.Builder()
                             .setBarcodeFormats(
                                     Barcode.FORMAT_ALL_FORMATS
-                                    )
+                            )
                             .build();
             BarcodeScanner scanner = BarcodeScanning.getClient(options);
             Task<List<Barcode>> result = scanner.process(inputImage)
@@ -210,30 +149,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void renderBarcodeData(List<Barcode> barcodes) {
-            overlayView.clear();
-            int b = 0;
             for (Barcode barcode: barcodes) {
-                if (nb == 0){
-                    tg.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-
-                    long[] pattern = { 0, 200, 500 };
-                    //v.vibrate(pattern,0);
-                    v.vibrate(500);
-                }
-                b = 1;
                 Rect bounds = barcode.getBoundingBox();
-
                 Point[] corners = barcode.getCornerPoints();
-                overlayView.add(corners);
-
-
 
                 String rawValue = barcode.getRawValue();
 
                 int valueType = barcode.getValueType();
 
-                /*Toast.makeText(getApplicationContext(),
-                        "Code: " + rawValue , Toast.LENGTH_SHORT).show();*/
+                Toast.makeText(getApplicationContext(),
+                        "Code: " + rawValue , Toast.LENGTH_SHORT).show();
 
                 // See API reference for complete list of supported
                 switch (valueType) {
@@ -247,18 +172,12 @@ public class MainActivity extends AppCompatActivity {
                                 "Producto: " + rawValue , Toast.LENGTH_SHORT).show();
                         break;*/
                     case Barcode.TYPE_URL:
-                       /* if (!bd.isAdded()){
-                            bd.show(fragmentManager,"");
-                        }
-                        bd.fetchurl(barcode.getUrl().getUrl());*/
 
                         String title = barcode.getUrl().getTitle();
                         String url = barcode.getUrl().getUrl();
                         break;
                 }
             }
-            nb = b;
         }
     }
-
 }

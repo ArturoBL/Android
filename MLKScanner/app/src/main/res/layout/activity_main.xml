@@ -16,15 +16,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/previewview" />
-    <RelativeLayout
+
+    <com.darklaker.mlkscanner.OverlayView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:id="@+id/image"
-            android:background="@drawable/background_image"/>
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:id="@+id/overlayview"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/chklayout">
+
+        <CheckBox
+            android:id="@+id/chkFlash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Flash"
+            android:layout_marginBottom="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
