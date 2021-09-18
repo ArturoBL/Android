@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CarMarker</string>
+    <string name="title_activity_maps">CarMarker</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCEffyPWk2MIE4gyzeQ8foE5Jmmo3D84Rs</string>
+</resources>
